@@ -1,0 +1,1 @@
+New-Item detector\__init__.py

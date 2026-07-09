@@ -1,0 +1,20 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Django
+cctv_backend/db.sqlite3
+cctv_backend/media/
+*.log
+
+# Environment secrets
+.env
+
+# React
+dashboard/node_modules/
+dashboard/dist/
+
+# OS
+.DS_Store
+Thumbs.db

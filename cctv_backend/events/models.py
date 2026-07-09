@@ -1,0 +1,28 @@
+from django.db import models
+
+
+class Event(models.Model):
+    EVENT_TYPES = [
+        ('person', 'Person Detected'),
+        ('motion', 'Motion Detected'),
+    ]
+
+    camera_name = models.CharField(max_length=100, default="Camera 1")
+    event_type = models.CharField(max_length=20, choices=EVENT_TYPES, default='person')
+    confidence = models.FloatField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to='event_images/', blank=True, null=True)
+    notified = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-timestamp']
+
+    def __str__(self):
+        return f"{self.event_type} - {self.camera_name} - {self.timestamp}"
+    
+class Camera(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    last_seen = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
