@@ -3,7 +3,7 @@ from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-7p!smk$9(=fbaz*eqeqty+m9-_6$6a#hz)+42f63ahx0^7e4)w'
+SECRET_KEY = 'django-insecure-CHANGE-THIS-TO-YOUR-ACTUAL-SECRET-KEY'
 
 DEBUG = True
 
@@ -24,7 +24,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -61,6 +60,18 @@ DATABASES = {
     }
 }
 
+
+#DATABASES = {
+ #   'default': {
+  #      'ENGINE': 'django.db.backends.postgresql',
+   #     'NAME': 'gm_database',
+    #    'USER': 'gmadmin',
+     #   'PASSWORD': 'StrongPassword123!',
+      #  'HOST': '192.168.1.11',   # <-- e.g. '192.168.1.15'
+       # 'PORT': '5432',
+    #}
+#}
+
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -79,7 +90,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True  # dev only, lock down before deployment
+CORS_ALLOW_ALL_ORIGINS = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (

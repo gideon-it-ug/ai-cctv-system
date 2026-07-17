@@ -1,41 +1,37 @@
-import cv2
 import time
-from ultralytics import YOLO
 
 
 class PersonDetector:
-    def __init__(self, model_path="yolo11n.pt", confidence_threshold=0.5, cooldown_seconds=10):
-        self.model = YOLO(model_path)
+    def __init__(self, confidence_threshold=0.5, cooldown_seconds=120):
         self.confidence_threshold = confidence_threshold
         self.cooldown_seconds = cooldown_seconds
         self.last_alert_time = 0
 
-    def detect(self, frame):
+    def analyze(self, result, names):
         """
-        Runs detection on a frame.
-        Returns (annotated_frame, person_detected: bool, confidence: float)
+        Extracts person detections from a YOLO result.
+        Returns (person_detected, confidence, person_count, person_boxes)
         """
-        results = self.model(frame, verbose=False)
-        annotated_frame = results[0].plot()
-
         person_detected = False
         best_confidence = 0.0
+        person_count = 0
+        person_boxes = []
 
-        for box in results[0].boxes:
+        for box in result.boxes:
             class_id = int(box.cls[0])
-            class_name = self.model.names[class_id]
+            class_name = names[class_id]
             confidence = float(box.conf[0])
 
             if class_name == "person" and confidence > self.confidence_threshold:
                 person_detected = True
+                person_count += 1
                 best_confidence = max(best_confidence, confidence)
+                x1, y1, x2, y2 = box.xyxy[0].tolist()
+                person_boxes.append((x1, y1, x2, y2))
 
-        return annotated_frame, person_detected, best_confidence
+        return person_detected, best_confidence, person_count, person_boxes
 
     def should_alert(self):
-        """
-        Returns True if enough time has passed since the last alert (cooldown logic).
-        """
         now = time.time()
         if now - self.last_alert_time >= self.cooldown_seconds:
             self.last_alert_time = now

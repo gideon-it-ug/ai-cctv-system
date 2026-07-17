@@ -4,10 +4,10 @@ import io
 
 
 class EventAPIClient:
-    def __init__(self, base_url="http://192.168.1.105:8000/api/events/"):  # use YOUR ip
+    def __init__(self, base_url="http://192.168.1.4:8000/api/events/"):
         self.base_url = base_url
 
-    def send_event(self, camera_name, event_type, confidence, frame):
+    def send_event(self, camera_name, event_type, confidence, frame, person_count=0, plate_number=None):
         success, buffer = cv2.imencode('.jpg', frame)
         if not success:
             print("Failed to encode frame")
@@ -18,18 +18,21 @@ class EventAPIClient:
             'camera_name': camera_name,
             'event_type': event_type,
             'confidence': confidence,
+            'person_count': person_count,
         }
+        if plate_number:
+            data['plate_number'] = plate_number
 
         try:
             response = requests.post(self.base_url, data=data, files=files, timeout=10)
             print(f"Event sent to API: {response.status_code}")
             if response.status_code == 201:
-                return response.json().get('image')  # returns full image URL
+                return response.json().get('image')
             return None
         except Exception as e:
             print(f"Failed to send event to API: {e}")
             return None
-    
+
     def send_heartbeat(self, camera_name):
         try:
             requests.post(
