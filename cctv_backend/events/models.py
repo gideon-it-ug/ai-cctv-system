@@ -29,6 +29,8 @@ class Event(models.Model):
         ('motion', 'Motion Detected'),
         ('abandoned_object', 'Abandoned Object'),
         ('license_plate', 'License Plate Detected'),
+        ('vehicle', 'Vehicle Detected'),
+        ('animal', 'Animal Detected'),
     ]
 
     camera_name = models.CharField(max_length=100, default="Camera 1")
@@ -36,6 +38,7 @@ class Event(models.Model):
     confidence = models.FloatField()
     person_count = models.IntegerField(default=0)
     plate_number = models.CharField(max_length=20, blank=True, null=True)
+    detected_class = models.CharField(max_length=50, blank=True, null=True)  # e.g. "car", "dog"
     timestamp = models.DateTimeField(auto_now_add=True)
     image = models.ImageField(upload_to='event_images/', blank=True, null=True)
     notified = models.BooleanField(default=False)

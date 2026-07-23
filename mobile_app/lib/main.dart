@@ -1,8 +1,7 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'models/event.dart';
-import 'services/api_service.dart';
+import 'services/auth_service.dart';
+import 'screens/login_screen.dart';
+import 'screens/event_feed_screen.dart';
 
 void main() {
   runApp(const CCTVApp());
@@ -25,100 +24,43 @@ class CCTVApp extends StatelessWidget {
         ),
         cardColor: const Color(0xFF12161B),
       ),
-      home: const EventFeedScreen(),
+      home: const AuthGate(),
     );
   }
 }
 
-class EventFeedScreen extends StatefulWidget {
-  const EventFeedScreen({super.key});
+class AuthGate extends StatefulWidget {
+  const AuthGate({super.key});
 
   @override
-  State<EventFeedScreen> createState() => _EventFeedScreenState();
+  State<AuthGate> createState() => _AuthGateState();
 }
 
-class _EventFeedScreenState extends State<EventFeedScreen> {
-  List<Event> _events = [];
-  bool _loading = true;
-  String? _error;
-  Timer? _timer;
+class _AuthGateState extends State<AuthGate> {
+  bool _checking = true;
+  bool _loggedIn = false;
 
   @override
   void initState() {
     super.initState();
-    _loadEvents();
-    _timer = Timer.periodic(const Duration(seconds: 5), (_) => _loadEvents());
+    _checkLogin();
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  Future<void> _loadEvents() async {
-    try {
-      final events = await ApiService.fetchEvents();
-      setState(() {
-        _events = events;
-        _loading = false;
-        _error = null;
-      });
-    } catch (e) {
-      setState(() {
-        _error = 'Could not reach backend';
-        _loading = false;
-      });
-    }
+  Future<void> _checkLogin() async {
+    final loggedIn = await AuthService.isLoggedIn();
+    setState(() {
+      _loggedIn = loggedIn;
+      _checking = false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF12161B),
-        title: const Text('🎥 Event Feed'),
-      ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : _error != null
-              ? Center(child: Text(_error!, style: const TextStyle(color: Colors.redAccent)))
-              : _events.isEmpty
-                  ? const Center(child: Text('No events yet.'))
-                  : RefreshIndicator(
-                      onRefresh: _loadEvents,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(12),
-                        itemCount: _events.length,
-                        itemBuilder: (context, index) {
-                          final event = _events[index];
-                          return Card(
-                            margin: const EdgeInsets.only(bottom: 10),
-                            child: ListTile(
-                              leading: event.imageUrl != null
-                                  ? ClipRRect(
-                                      borderRadius: BorderRadius.circular(6),
-                                      child: Image.network(
-                                        event.imageUrl!,
-                                        width: 60,
-                                        height: 60,
-                                        fit: BoxFit.cover,
-                                        errorBuilder: (_, __, ___) =>
-                                            const Icon(Icons.image_not_supported),
-                                      ),
-                                    )
-                                  : const Icon(Icons.camera_alt),
-                              title: Text('${event.cameraName} — ${event.eventType}'),
-                              subtitle: Text(
-                                '${(event.confidence * 100).toStringAsFixed(0)}% confidence\n'
-                                '${DateFormat.yMMMd().add_jm().format(DateTime.parse(event.timestamp).toLocal())}',
-                              ),
-                              isThreeLine: true,
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-    );
+    if (_checking) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    return _loggedIn ? const EventFeedScreen() : const LoginScreen();
   }
 }

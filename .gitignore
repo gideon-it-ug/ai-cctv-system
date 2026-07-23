@@ -15,6 +15,15 @@ cctv_backend/media/
 dashboard/node_modules/
 dashboard/dist/
 
+# Flutter
+mobile_app/build/
+mobile_app/.dart_tool/
+mobile_app/android/.gradle/
+
+# YOLO models (large, regenerable)
+yolo11n.pt
+yolo11n_openvino_model/
+
 # OS
 .DS_Store
 Thumbs.db

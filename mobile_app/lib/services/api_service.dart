@@ -1,13 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/event.dart';
+import '../config.dart';
 
 class ApiService {
-  // Use your laptop's LAN IP, same one your React dashboard uses
-  static const String baseUrl = "http://192.168.1.4:8000/api";
-
   static Future<List<Event>> fetchEvents() async {
-    final response = await http.get(Uri.parse('$baseUrl/events/'));
+    final response = await http.get(Uri.parse('${AppConfig.baseUrl}/events/'));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);

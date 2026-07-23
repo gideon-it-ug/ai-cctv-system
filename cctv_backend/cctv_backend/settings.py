@@ -7,7 +7,7 @@ SECRET_KEY = 'django-insecure-CHANGE-THIS-TO-YOUR-ACTUAL-SECRET-KEY'
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.1.4']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '192.168.1.4', '10.0.2.2']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -59,18 +59,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
-
-#DATABASES = {
- #   'default': {
-  #      'ENGINE': 'django.db.backends.postgresql',
-   #     'NAME': 'gm_database',
-    #    'USER': 'gmadmin',
-     #   'PASSWORD': 'StrongPassword123!',
-      #  'HOST': '192.168.1.11',   # <-- e.g. '192.168.1.15'
-       # 'PORT': '5432',
-    #}
-#}
 
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},

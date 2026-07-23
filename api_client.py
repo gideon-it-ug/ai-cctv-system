@@ -7,7 +7,8 @@ class EventAPIClient:
     def __init__(self, base_url="http://192.168.1.4:8000/api/events/"):
         self.base_url = base_url
 
-    def send_event(self, camera_name, event_type, confidence, frame, person_count=0, plate_number=None):
+    def send_event(self, camera_name, event_type, confidence, frame,
+                    person_count=0, plate_number=None, detected_class=None):
         success, buffer = cv2.imencode('.jpg', frame)
         if not success:
             print("Failed to encode frame")
@@ -22,6 +23,8 @@ class EventAPIClient:
         }
         if plate_number:
             data['plate_number'] = plate_number
+        if detected_class:
+            data['detected_class'] = detected_class
 
         try:
             response = requests.post(self.base_url, data=data, files=files, timeout=10)

@@ -10,13 +10,13 @@ from api_client import EventAPIClient
 # --- Config ---
 CAMERA_NAME = "Camera 1"
 WHATSAPP_PHONE = "256740797259"   # your number, international format, no +
-WHATSAPP_APIKEY = "2938366"   # from CallMeBot
+WHATSAPP_APIKEY = "YOUR_APIKEY"   # from CallMeBot
 DJANGO_IP = "192.168.1.4"         # your laptop's IP
 FRAME_SKIP = 3
-PLATE_CHECK_EVERY = 15            # run OCR less often, it's heavier than detection
+PLATE_CHECK_EVERY = 15
 
 engine = YOLOEngine(model_path="yolo11n_openvino_model/")
-person_detector = PersonDetector(confidence_threshold=0.5, cooldown_seconds=120)
+detector = PersonDetector(confidence_threshold=0.5, cooldown_seconds=120)
 object_tracker = AbandonedObjectTracker()
 plate_reader = PlateReader()
 notifier = WhatsAppNotifier(WHATSAPP_PHONE, WHATSAPP_APIKEY)
@@ -53,13 +53,13 @@ while True:
         result = engine.infer(frame)
         names = engine.names
 
-        person_detected, confidence, person_count, person_boxes = person_detector.analyze(result, names)
-        abandoned_objects = object_tracker.update(result, names, person_boxes)
+        detections = detector.analyze(result, names)
+        abandoned_objects = object_tracker.update(result, names, detections["person_boxes"])
 
         annotated_frame = result.plot()
         cv2.putText(
             annotated_frame,
-            f"People: {person_count}",
+            f"People: {detections['person_count']}",
             (15, 35),
             cv2.FONT_HERSHEY_SIMPLEX,
             1.0,
@@ -69,13 +69,39 @@ while True:
         last_display_frame = annotated_frame
 
         # --- Person alert ---
-        if person_detected and person_detector.should_alert():
-            print(f"ALERT: {person_count} person(s) detected! Confidence: {confidence:.2f}")
-            image_url = api_client.send_event(CAMERA_NAME, "person", confidence, frame, person_count)
-            message = (
-                f"SECURITY ALERT - {person_count} person(s) detected on {CAMERA_NAME} "
-                f"- Confidence: {confidence:.0%}"
+        if detections["person_detected"] and detector.should_alert_person():
+            print(f"ALERT: {detections['person_count']} person(s) detected!")
+            image_url = api_client.send_event(
+                CAMERA_NAME, "person", detections["person_confidence"], frame, detections["person_count"]
             )
+            message = (
+                f"SECURITY ALERT - {detections['person_count']} person(s) detected on {CAMERA_NAME} "
+                f"- Confidence: {detections['person_confidence']:.0%}"
+            )
+            if image_url:
+                message += f" - View image: {image_url}"
+            notifier.send_alert(message)
+
+        # --- Vehicle alert ---
+        if detections["vehicle_detected"] and detector.should_alert_vehicle():
+            print(f"ALERT: Vehicle detected - {detections['vehicle_type']}")
+            image_url = api_client.send_event(
+                CAMERA_NAME, "vehicle", detections["vehicle_confidence"], frame,
+                detected_class=detections["vehicle_type"]
+            )
+            message = f"VEHICLE ALERT - {detections['vehicle_type']} detected on {CAMERA_NAME}"
+            if image_url:
+                message += f" - View image: {image_url}"
+            notifier.send_alert(message)
+
+        # --- Animal alert ---
+        if detections["animal_detected"] and detector.should_alert_animal():
+            print(f"ALERT: Animal detected - {detections['animal_type']}")
+            image_url = api_client.send_event(
+                CAMERA_NAME, "animal", detections["animal_confidence"], frame,
+                detected_class=detections["animal_type"]
+            )
+            message = f"ANIMAL ALERT - {detections['animal_type']} detected on {CAMERA_NAME}"
             if image_url:
                 message += f" - View image: {image_url}"
             notifier.send_alert(message)
@@ -92,7 +118,7 @@ while True:
                 message += f" - View image: {image_url}"
             notifier.send_alert(message)
 
-        # --- License plate check (less frequent, OCR is heavy) ---
+        # --- License plate check ---
         if frame_counter % PLATE_CHECK_EVERY == 0:
             plates = plate_reader.read_plates(frame, result, names)
             for plate_text, box in plates:
