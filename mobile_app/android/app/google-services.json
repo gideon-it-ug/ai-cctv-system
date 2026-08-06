@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "98943941815",
+    "project_id": "ai-cctv-system",
+    "storage_bucket": "ai-cctv-system.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:98943941815:android:f823cbd046e05dc202a132",
+        "android_client_info": {
+          "package_name": "com.example.mobile_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtk9ABcMq2DXiJYuJ0y6eGcOd7glpfwqE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
