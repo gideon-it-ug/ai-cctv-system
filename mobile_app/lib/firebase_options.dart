@@ -56,7 +56,6 @@ class DefaultFirebaseOptions {
     projectId: 'ai-cctv-system',
     storageBucket: 'ai-cctv-system.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDsor5sAfbGlOQw53jsh0fy-kfgpdQc42Q',
     appId: '1:98943941815:ios:f8d294c2409e96f502a132',
@@ -65,7 +64,6 @@ class DefaultFirebaseOptions {
     storageBucket: 'ai-cctv-system.firebasestorage.app',
     iosBundleId: 'com.example.mobileApp',
   );
-
   static const FirebaseOptions macos = FirebaseOptions(
     apiKey: 'AIzaSyDsor5sAfbGlOQw53jsh0fy-kfgpdQc42Q',
     appId: '1:98943941815:ios:f8d294c2409e96f502a132',
