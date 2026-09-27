@@ -10,8 +10,8 @@ from api_client import EventAPIClient
 # --- Config ---
 CAMERA_NAME = "Camera 1"
 WHATSAPP_PHONE = "256740797259"   # your number, international format, no +
-WHATSAPP_APIKEY = "YOUR_APIKEY"   # from CallMeBot
-DJANGO_IP = "192.168.1.4"         # your laptop's IP
+WHATSAPP_APIKEY = "2938366"   # from CallMeBot
+DJANGO_IP = "192.168.1.11" 
 FRAME_SKIP = 3
 PLATE_CHECK_EVERY = 15
 
